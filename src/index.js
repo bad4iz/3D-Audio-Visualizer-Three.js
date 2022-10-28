@@ -7,15 +7,49 @@ const test = new SceneInit("myThreeJsCanvas");
 // test.initScene();
 test.animate();
 
-// function setupAudioContext() {
-const audioContext = new window.AudioContext();
-const audioElement = document.getElementById("myAudio");
-const source = audioContext.createMediaElementSource(audioElement);
-const analyser = audioContext.createAnalyser();
-source.connect(analyser);
-analyser.fftSize = 1024;
-const dataArray = new Uint8Array(analyser.frequencyBinCount);
-// }
+const Analyse = function () {
+  var an = this;
+
+  //Создание источника
+  this.audio = new Audio();
+  this.audio.src = "./assets/Lyudvig_van_Betkhoven.mp3";
+  this.controls = true;
+  //Создаем аудио-контекст
+  this.context = new AudioContext();
+  this.node = this.context.createScriptProcessor(2048, 1, 1);
+  //Создаем анализатор
+  this.analyser = this.context.createAnalyser();
+  // this.analyser.smoothingTimeConstant = 0.3;
+  this.analyser.fftSize = 512;
+  this.bands = new Uint8Array(this.analyser.frequencyBinCount);
+  //Подписываемся на событие
+  this.audio.addEventListener("canplay", function () {
+    //отправляем на обработку в  AudioContext
+    an.source = an.context.createMediaElementSource(an.audio);
+    //связываем источник и анализатором
+    an.source.connect(an.analyser);
+    //связываем анализатор с интерфейсом, из которого он будет получать данные
+    an.analyser.connect(an.node);
+    //Связываем все с выходом
+    an.node.connect(an.context.destination);
+    an.source.connect(an.context.destination);
+    //подписываемся на событие изменения входных данных
+    an.node.onaudioprocess = function () {
+      an.analyser.getByteFrequencyData(an.bands);
+      if (!an.audio.paused) {
+        if (typeof an.update === "function") {
+          return an.update(an.bands);
+        } else {
+          return 0;
+        }
+      }
+    };
+  });
+
+  return this;
+};
+
+const elem = new Analyse();
 
 const uniforms = {
   u_time: {
@@ -28,7 +62,7 @@ const uniforms = {
   },
   u_data_arr: {
     type: "float[64]",
-    value: dataArray,
+    value: elem.bands,
   },
 
   // u_black: { type: "vec3", value: new THREE.Color(0x000000) },
@@ -36,9 +70,9 @@ const uniforms = {
 };
 const render = (time) => {
   // console.log(dataArray);
-  analyser.getByteFrequencyData(dataArray);
+  elem.analyser.getByteFrequencyData(elem.bands);
   uniforms.u_time.value = time;
-  uniforms.u_data_arr.value = dataArray;
+  uniforms.u_data_arr.value = elem.bands;
   requestAnimationFrame(render);
 };
 
@@ -49,7 +83,7 @@ const planeCustomMaterial = new ShaderMaterial({
   uniforms: uniforms,
   vertexShader: vertexShader(),
   fragmentShader: fragmentShader(),
-  wireframe: true,
+  // wireframe: true,
 });
 const planeMesh = new Mesh(planeGeometry, planeCustomMaterial);
 planeMesh.rotation.x = -Math.PI + Math.PI / 6;
@@ -59,5 +93,6 @@ test.add(planeMesh);
 
 const play = document.querySelector(".play");
 play.addEventListener("click", () => {
-  [...document.querySelectorAll(".audio")].forEach((item) => item.play());
+  elem.audio.play();
+  // [...document.querySelectorAll(".audio")].forEach((item) => item.play());
 });
