@@ -95,16 +95,17 @@ const render = (time) => {
 const test = new SceneInit("myThreeJsCanvas");
 test.animate();
 
-const planeGeometry = new PlaneGeometry(64, 64, 64, 64);
+const planeGeometry = new PlaneGeometry(100, 100, 100, 100);
 const planeMaterial = new MeshNormalMaterial({ wireframe: true });
 const planeCustomMaterial = new ShaderMaterial({
   uniforms: uniforms,
   vertexShader: vertexShader(),
   fragmentShader: fragmentShader(),
-  // wireframe: true,
+  wireframe: true,
 });
 const planeMesh = new Mesh(planeGeometry, planeCustomMaterial);
-planeMesh.rotation.x = -Math.PI + Math.PI / 6;
+planeMesh.rotation.y = 0.3;
+planeMesh.rotation.x = -Math.PI / 2;
 
 test.add(planeMesh);
 
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const playBtn = document.querySelector("#play");
   playBtn.addEventListener("click", () => {
     if (!elem.audio.src) {
-      elem.audio.src = "./assets/thunderstruck.mp3";
+      elem.audio.src = "./assets/satisfaction.mp3";
     }
     if (elem.context.state === "suspended") {
       elem.context.resume();

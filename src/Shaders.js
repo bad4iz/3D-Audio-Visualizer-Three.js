@@ -7,6 +7,7 @@ const vertexShader = () => {
       uniform float u_time;
       uniform float u_amplitude;
       uniform float[64] u_data_arr;
+      uniform sampler2D u_video;
       void main() {
         vUv = position;
         x = abs(position.x);

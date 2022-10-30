@@ -1,11 +1,11 @@
-import { Scene, PerspectiveCamera, WebGLRenderer } from "three";
+import { Scene, PerspectiveCamera, WebGLRenderer, AxesHelper } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export class SceneInit {
   constructor(id) {
     this._scene = new Scene();
     this._camera = new PerspectiveCamera(
-      75,
+      25,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
@@ -16,8 +16,10 @@ export class SceneInit {
     document.body.appendChild(this._renderer.domElement);
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
 
-    // this._camera.position.z = 100;
-    this._camera.position.y = 70;
+    this._camera.position.x = 100;
+    // const axesHelper = new AxesHelper(50);
+    // axesHelper.setColors("red", "green", "blue");
+    // this._scene.add(axesHelper);
 
     window.addEventListener("resize", () => this.onWindowResize(), false);
   }
