@@ -12,7 +12,10 @@
   <body>
 
   <style>
-    .play {
+    .play-controls__container{
+      position: absolute;
+    }
+    .play-controls {
       padding: 1rem 4rem;
       background-color: green;
       border-radius: 1rem;
@@ -21,7 +24,11 @@
     }
   </style>
   
-  <button class="play" style="z-index: 999;position: absolute">play</button>
+  <div class="play-controls__container">
+  
+  <button id="play" class="play-controls">play</button>
+  <button id="pause" class="play-controls">pause</button>
+  </div>
     <script type="module"
             src="./src/index.js"></script>
   </body>
