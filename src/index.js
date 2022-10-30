@@ -1,67 +1,42 @@
 import { SceneInit } from "./SceneInit";
-import { Mesh, MeshNormalMaterial, PlaneGeometry, ShaderMaterial } from "three";
+import {
+  Mesh,
+  MeshNormalMaterial,
+  PlaneGeometry,
+  ShaderMaterial,
+  VideoTexture,
+} from "three";
 
 import { vertexShader, fragmentShader } from "./Shaders.js";
 
-// const Analyseq = function () {
-//   var an = this;
-//
-//   //Создание источника
-//   this.audio = new Audio();
-//
-//   this.controls = true;
-//   //Создаем аудио-контекст
-//   this.context = new AudioContext();
-//   this.node = this.context.createScriptProcessor(2048, 1, 1);
-//   //Создаем анализатор
-//   this.analyser = this.context.createAnalyser();
-//   // this.analyser.smoothingTimeConstant = 0.3;
-//   this.analyser.fftSize = 1024;
-//   this.bands = new Uint8Array(this.analyser.frequencyBinCount);
-//   //Подписываемся на событие
-//   this.audio.addEventListener("canplay", function () {
-//     //отправляем на обработку в  AudioContext
-//     an.source = an.context.createMediaElementSource(an.audio);
-//     //связываем источник и анализатором
-//     an.source.connect(an.analyser);
-//     //связываем анализатор с интерфейсом, из которого он будет получать данные
-//     an.analyser.connect(an.node);
-//     //Связываем все с выходом
-//     an.node.connect(an.context.destination);
-//     an.source.connect(an.context.destination);
-//     //подписываемся на событие изменения входных данных
-//     an.node.onaudioprocess = function () {
-//       an.analyser.getByteFrequencyData(an.bands);
-//       if (!an.audio.paused) {
-//         if (typeof an.update === "function") {
-//           return an.update(an.bands);
-//         } else {
-//           return 0;
-//         }
-//       }
-//     };
-//   });
-//
-//   return this;
-// };
-
-const Analyse = function () {
-  var an = this;
-
+const Analyse = function (propAudio) {
   this.audio = new Audio();
   const context = new AudioContext();
-  const source = context.createMediaElementSource(this.audio);
+  const source = context.createMediaElementSource(propAudio || this.audio);
   this.analyser = context.createAnalyser();
   source.connect(this.analyser);
   this.analyser.connect(context.destination);
   this.analyser.fftSize = 1024;
   this.bands = new Uint8Array(this.analyser.frequencyBinCount);
-  this.audio.addEventListener("canplay", () => {});
   this.context = context;
   return this;
 };
 
-const elem = new Analyse();
+const video = document.createElement("video");
+video.width = 1200;
+video.height = 1200;
+video.src = "assets/satisfaction.mp4";
+
+const texture = new VideoTexture(video);
+
+const elem = new Analyse(video);
+
+let uAmplitude = 8.0;
+
+u_amplitude.addEventListener("change", (e) => {
+  console.log(e.target.value);
+  uAmplitude = (+e.target.value).toFixed(2);
+});
 
 const uniforms = {
   u_time: {
@@ -70,22 +45,24 @@ const uniforms = {
   },
   u_amplitude: {
     type: "f",
-    value: 3.0,
+    value: uAmplitude,
   },
   u_data_arr: {
     type: "float[64]",
     value: elem.bands,
   },
-
-  // u_black: { type: "vec3", value: new THREE.Color(0x000000) },
-  // u_white: { type: "vec3", value: new THREE.Color(0xffffff) },
+  map: {
+    type: "sampler2D",
+    value: texture,
+  },
 };
 let playFlag = false;
 
 const render = (time) => {
-  // console.log(dataArray);
   elem.analyser.getByteFrequencyData(elem.bands);
   uniforms.u_time.value = time;
+  uniforms.map.value = texture;
+  uniforms.u_amplitude.value = uAmplitude;
   uniforms.u_data_arr.value = elem.bands;
   if (playFlag) {
     requestAnimationFrame(render);
@@ -104,29 +81,47 @@ const planeCustomMaterial = new ShaderMaterial({
   wireframe: true,
 });
 const planeMesh = new Mesh(planeGeometry, planeCustomMaterial);
-planeMesh.rotation.y = 0.3;
+planeMesh.rotation.z = -Math.PI / 2 - 0.1;
+planeMesh.rotation.y = -1;
 planeMesh.rotation.x = -Math.PI / 2;
 
 test.add(planeMesh);
 
-// [...document.querySelectorAll(".audio")].forEach((item) => item.play());
 document.addEventListener("DOMContentLoaded", () => {
   const playBtn = document.querySelector("#play");
   playBtn.addEventListener("click", () => {
-    if (!elem.audio.src) {
-      elem.audio.src = "./assets/satisfaction.mp3";
-    }
     if (elem.context.state === "suspended") {
       elem.context.resume();
     }
-    elem.audio.play();
+    video.play();
     playFlag = true;
     render();
   });
 
   const pauseBtn = document.querySelector("#pause");
   pauseBtn.addEventListener("click", () => {
-    elem.audio.pause();
+    video.pause();
     playFlag = false;
   });
+});
+
+let currentTime = 30;
+video.addEventListener("play", function () {
+  this.currentTime = currentTime;
+});
+
+destinationCalabria.addEventListener("click", () => {
+  currentTime = 0;
+  video.src = "assets/destinationCalabria.mp4";
+  video.play();
+  playFlag = true;
+  render();
+});
+
+satisfaction.addEventListener("click", () => {
+  currentTime = 30;
+  video.src = "assets/satisfaction.mp4";
+  video.play();
+  playFlag = true;
+  render();
 });

@@ -12,22 +12,65 @@
   <body>
 
   <style>
-    .play-controls__container{
-      position: absolute;
+    .play-controls__container {
+        position: absolute;
+        width: 100%;
+        padding: 1rem;
     }
+
+    .play-controls__container--bottom {
+        bottom: 2rem;
+        left: 2rem;
+        right: 2rem;
+    }
+
     .play-controls {
-      padding: 1rem 4rem;
-      background-color: green;
-      border-radius: 1rem;
-      margin: 2rem;
-      font-size: 3rem;
+        padding: 1rem 4rem;
+        background-color: green;
+        border-radius: 1rem;
+        margin: 1rem;
+        font-size: 2rem;
+    }
+
+    .u_amplitude {
+        color: white;
+    }
+
+    #u_amplitude {
+        width: 88%;
     }
   </style>
   
   <div class="play-controls__container">
   
-  <button id="play" class="play-controls">play</button>
-  <button id="pause" class="play-controls">pause</button>
+  <button id="play"
+          class="play-controls">play</button>
+  <button id="pause"
+          class="play-controls">pause</button>
+  
+  <button id="destinationCalabria"
+          class="play-controls">destination</button>
+ 
+  
+  <button id="satisfaction"
+          class="play-controls">satisfaction</button>
+ 
+
+    
+  </div>
+  <div class="play-controls__container play-controls__container--bottom">
+
+  <br>
+  <label for="u_amplitude"
+         class="u_amplitude">Amplitude</label>
+      <input type="range"
+             id="u_amplitude"
+             name="volume"
+             step="0.1"
+             value="8.0"
+             min="0"
+             max="40">
+    
   </div>
     <script type="module"
             src="./src/index.js"></script>

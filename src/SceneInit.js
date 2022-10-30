@@ -1,4 +1,10 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, AxesHelper } from "three";
+import {
+  Scene,
+  PerspectiveCamera,
+  WebGLRenderer,
+  AxesHelper,
+  DirectionalLight,
+} from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export class SceneInit {
@@ -11,15 +17,19 @@ export class SceneInit {
       1000
     );
     this._renderer = new WebGLRenderer();
-    // this._renderer.domElement.id = id;
     this._renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this._renderer.domElement);
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
 
-    this._camera.position.x = 100;
+    this._camera.position.x = -250;
+
     // const axesHelper = new AxesHelper(50);
     // axesHelper.setColors("red", "green", "blue");
     // this._scene.add(axesHelper);
+
+    const light = new DirectionalLight(0xffffff);
+    light.position.set(0.5, 1, 1).normalize();
+    this._scene.add(light);
 
     window.addEventListener("resize", () => this.onWindowResize(), false);
   }
